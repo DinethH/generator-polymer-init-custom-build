@@ -18,9 +18,14 @@ const gulpif = require('gulp-if');
 // const logging = require('plylog');
 // logging.setVerbose();
 
-// !!! IMPORTANT !!! //
-// Keep the global.config above any of the gulp-tasks that depend on it
-global.config = {
+// Add your own custom gulp tasks to the gulp-tasks directory
+// A few sample tasks are provided for you
+// A task should return either a WriteableStream or a Promise
+const clean = require('./gulp-tasks/clean.js');
+const images = require('./gulp-tasks/images.js');
+const PolymerProject = require('./gulp-tasks/polymer-project.js');
+
+const config = {
   polymerJsonPath: path.join(process.cwd(), 'polymer.json'),
   build: {
     rootDirectory: 'build',
@@ -38,16 +43,15 @@ global.config = {
   // Service Worker precache options based on
   // https://github.com/GoogleChrome/sw-precache#options-parameter
   swPrecacheConfig: {
-    navigateFallback: '/index.html'
+    navigateFallback: '/index.html',
+    staticFileGlobs: [
+      '/bower_components/webcomponentsjs/webcomponents-lite.min.js',
+      '/index.html',
+      '/manifest.json'
+    ]
   }
 };
-
-// Add your own custom gulp tasks to the gulp-tasks directory
-// A few sample tasks are provided for you
-// A task should return either a WriteableStream or a Promise
-const clean = require('./gulp-tasks/clean.js');
-const images = require('./gulp-tasks/images.js');
-const project = require('./gulp-tasks/project.js');
+const project = new PolymerProject(config);
 
 // The source task will split all of your source files into one
 // big ReadableStream. Source files are those in src/** as well as anything
@@ -76,7 +80,7 @@ function dependencies() {
 // and process them, and output bundled and unbundled versions of the project
 // with their own service workers
 gulp.task('default', gulp.series([
-  clean([global.config.build.rootDirectory]),
+  clean([config.build.rootDirectory]),
   project.merge(source, dependencies),
   project.serviceWorker
 ]));
