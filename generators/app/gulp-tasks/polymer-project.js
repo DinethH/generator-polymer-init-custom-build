@@ -61,22 +61,18 @@ class PolymerProject {
   // Takes an argument for the user to specify the kind of output they want
   // either bundled or unbundled. If this argument is omitted it will output both
   merge(source, dependencies) {
-    var _this = this;
+    const mergedFiles = mergeStream(source(), dependencies())
+      .pipe(this.project.analyzer);
+    let outputs = [];
 
-    return function output() {
-      const mergedFiles = mergeStream(source(), dependencies())
-        .pipe(_this.project.analyzer);
-      let outputs = [];
+    if (this.bundleType === 'both' || this.bundleType === 'bundled') {
+      outputs.push(this.writeBundledOutput(polymer.forkStream(mergedFiles)));
+    }
+    if (this.bundleType === 'both' || this.bundleType === 'unbundled') {
+      outputs.push(this.writeUnbundledOutput(polymer.forkStream(mergedFiles)));
+    }
 
-      if (_this.bundleType === 'both' || _this.bundleType === 'bundled') {
-        outputs.push(_this.writeBundledOutput(polymer.forkStream(mergedFiles)));
-      }
-      if (_this.bundleType === 'both' || _this.bundleType === 'unbundled') {
-        outputs.push(_this.writeUnbundledOutput(polymer.forkStream(mergedFiles)));
-      }
-
-      return Promise.all(outputs);
-    };
+    return Promise.all(outputs);
   }
 
   // Run the files through a bundling step which will vulcanize/shard them

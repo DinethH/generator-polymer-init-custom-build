@@ -81,6 +81,6 @@ function dependencies() {
 // with their own service workers
 gulp.task('default', gulp.series([
   clean([config.build.rootDirectory]),
-  project.merge(source, dependencies),
-  project.serviceWorker
+  project.merge.bind(project, source, dependencies),
+  project.serviceWorker.bind(project)
 ]));
