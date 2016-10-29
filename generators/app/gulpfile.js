@@ -23,7 +23,7 @@ const gulpif = require('gulp-if');
 // A task should return either a WriteableStream or a Promise
 const clean = require('./gulp-tasks/clean.js');
 const images = require('./gulp-tasks/images.js');
-const PolymerProject = require('./gulp-tasks/polymer-project.js');
+const PolymerProject = require('./gulp-tasks/project.js');
 
 const config = {
   polymerJsonPath: path.join(process.cwd(), 'polymer.json'),
